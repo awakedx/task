@@ -1,0 +1,6 @@
+server: 
+  port: 8080
+  readTimeOut: 10s
+  writeTimeout: 10s
+database:
+  migrationsPath: file://./internal/repository/migrations
