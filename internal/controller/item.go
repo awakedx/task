@@ -2,10 +2,11 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
-	"github.com/awakedx/task/internal/common"
+	cm "github.com/awakedx/task/internal/common/item"
 	"github.com/awakedx/task/internal/service/item"
 	"github.com/awakedx/task/internal/utils"
 )
@@ -24,7 +25,7 @@ func (h *Handler) NewItem(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	ids, err := h.services.Items.NewItem(r.Context(), &itemValue)
+	ids, err := h.service.Items.NewItem(r.Context(), &itemValue)
 	if err != nil {
 		utils.WriteJSONResponse(w, http.StatusInternalServerError, err)
 		return
@@ -43,7 +44,7 @@ func (h *Handler) DeleteItem(w http.ResponseWriter, r *http.Request) {
 			"error": "Invalid id",
 		})
 	}
-	id, err := h.services.Items.Delete(r.Context(), itemId)
+	id, err := h.service.Items.Delete(r.Context(), itemId)
 	if err != nil && err.Error() != "Nothing to delete" {
 		utils.WriteJSONResponse(w, http.StatusInternalServerError, map[string]any{
 			"delete id": id,
@@ -71,15 +72,16 @@ func (h *Handler) GetItem(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	i, err := h.services.Items.Get(r.Context(), itemId)
-	if err != nil && err.Error() != "not found by id" {
-		utils.WriteJSONResponse(w, http.StatusInternalServerError, map[string]any{
-			"error": err.Error(),
+
+	i, err := h.service.Items.Get(r.Context(), itemId)
+	if err != nil && errors.Is(err, utils.NotFoundError) {
+		utils.WriteJSONResponse(w, http.StatusNotFound, map[string]any{
+			"error": utils.NotFoundError.Error(),
 		})
 		return
 	}
-	if err != nil && err.Error() == "not found by id" {
-		utils.WriteJSONResponse(w, http.StatusBadRequest, map[string]any{
+	if err != nil && errors.Is(err, utils.InternalError) {
+		utils.WriteJSONResponse(w, http.StatusInternalServerError, map[string]any{
 			"error": err.Error(),
 		})
 		return
@@ -98,7 +100,7 @@ func (h *Handler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	var updateItem common.UpdateItem
+	var updateItem cm.UpdateItem
 	if err = json.NewDecoder(r.Body).Decode(&updateItem); err != nil {
 		utils.WriteJSONResponse(w, http.StatusBadRequest, map[string]any{
 			"error": err.Error(),
@@ -112,7 +114,7 @@ func (h *Handler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	updateItem.Id = &id
-	err = h.services.Items.UpdateItem(r.Context(), &updateItem)
+	err = h.service.Items.UpdateItem(r.Context(), &updateItem)
 	if err != nil && err.Error() != "not found by id" {
 		utils.WriteJSONResponse(w, http.StatusInternalServerError, map[string]any{
 			"error": err.Error(),

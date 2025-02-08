@@ -2,20 +2,23 @@ package item
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
-	"github.com/awakedx/task/internal/common"
+	"github.com/awakedx/task/internal/common/item"
 	"github.com/awakedx/task/internal/domain"
 	"github.com/awakedx/task/internal/repository"
-	"github.com/google/uuid"
+	"github.com/awakedx/task/internal/utils"
+	"github.com/jackc/pgx/v5"
 )
 
 type ItemService struct {
-	repo repository.Items
+	store *repository.Store
 }
 
-func NewItemService(repo repository.Items) *ItemService {
+func NewItemService(store *repository.Store) *ItemService {
 	return &ItemService{
-		repo: repo,
+		store: store,
 	}
 }
 
@@ -29,7 +32,7 @@ func (s *ItemService) NewItem(ctx context.Context, itemValues *ItemValues) ([]in
 			Stock:       v.Stock,
 			SellerId:    v.SellerId,
 		}
-		id, err := s.repo.Create(ctx, &item)
+		id, err := s.store.Items.Create(ctx, &item)
 		ids = append(ids, id)
 		if err != nil {
 			return nil, err
@@ -40,36 +43,28 @@ func (s *ItemService) NewItem(ctx context.Context, itemValues *ItemValues) ([]in
 }
 
 func (s *ItemService) Get(ctx context.Context, itemId int) (*domain.Item, error) {
-	item, err := s.repo.GetById(ctx, itemId)
+	item, err := s.store.Items.GetById(ctx, itemId)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, fmt.Errorf("Service.Get() %w , %w", err, utils.NotFoundError)
+		} else {
+			return nil, fmt.Errorf("Error:%w,%w", err, utils.InternalError)
+		}
 	}
 	return item, nil
 }
 
 func (s *ItemService) Delete(ctx context.Context, itemId int) (int, error) {
-	return s.repo.Delete(ctx, itemId)
+	return s.store.Items.Delete(ctx, itemId)
 }
 
 func (s *ItemService) UpdateItem(ctx context.Context, updateItem *common.UpdateItem) error {
-	_, err := s.repo.GetById(ctx, *updateItem.Id)
+	_, err := s.store.Items.GetById(ctx, *updateItem.Id)
 	if err != nil {
 		return err
 	}
-	if err = s.repo.Update(ctx, updateItem); err != nil {
+	if err = s.store.Items.Update(ctx, updateItem); err != nil {
 		return err
 	}
 	return nil
-}
-
-type ItemValues struct {
-	Items []NewItem `json:"items" validate:"required"`
-}
-
-type NewItem struct {
-	Name        string    `json:"name" validate:"required"`
-	Description string    `json:"desc" validate:"required"`
-	Price       float64   `json:"price" validate:"required"`
-	Stock       int       `json:"stock" validate:"required"`
-	SellerId    uuid.UUID `json:"sellerId" validate:"required,uuid"`
 }

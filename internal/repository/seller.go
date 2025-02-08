@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/awakedx/task/internal/domain"
+	"github.com/awakedx/task/internal/utils"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type SellerRepo struct {
@@ -27,8 +29,14 @@ func (r *SellerRepo) Create(ctx context.Context, seller *domain.Seller) (uuid.UU
 		seller.Name,
 		seller.Phone,
 	).Scan(&id)
-	if err != nil {
-		return uuid.Nil, fmt.Errorf("Failed to create item")
+	var pgErr *pgconn.PgError
+	if err != nil && errors.As(err, &pgErr) {
+		if pgErr.Code == "23505" {
+			return uuid.Nil, &utils.CustomErr{
+				Msg:   "Seller with this phone already existing",
+				Cause: utils.BadRequestErr,
+			}
+		}
 	}
 	return id, nil
 }

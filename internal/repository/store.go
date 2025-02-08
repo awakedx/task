@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/awakedx/task/internal/common"
+	"github.com/awakedx/task/internal/common/item"
 	"github.com/awakedx/task/internal/domain"
 	"github.com/google/uuid"
 )

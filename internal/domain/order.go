@@ -7,13 +7,14 @@ import (
 )
 
 type Order struct {
-	Id           int
-	CustomerId   uuid.UUID
-	CreatedAt    time.Time
-	OrderDetails []OrderProduct
+	Id         int         `json:"id"`
+	CreatedAt  time.Time   `json:"createdAt"`
+	TotalCost  float64     `json:"TotalCost"`
+	CustomerId uuid.UUID   `json:"customerId"`
+	Items      []OrderItem `json:"items"`
 }
 
-type OrderProduct struct {
+type OrderItem struct {
 	ItemId   int `json:"ItemId"`
 	Quantity int `json:"Quantity"`
 	Price    int `json:"price"`

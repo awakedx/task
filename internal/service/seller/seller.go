@@ -9,15 +9,15 @@ import (
 )
 
 type SellerService struct {
-	repo repository.Sellers
+	store *repository.Store
 }
 
-func NewSellerService(repo repository.Sellers) *SellerService {
+func NewSellerService(store *repository.Store) *SellerService {
 	return &SellerService{
-		repo: repo,
+		store: store,
 	}
 }
 
 func (s *SellerService) Create(ctx context.Context, newSeller *domain.Seller) (uuid.UUID, error) {
-	return s.repo.Create(ctx, newSeller)
+	return s.store.Sellers.Create(ctx, newSeller)
 }

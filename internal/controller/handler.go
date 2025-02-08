@@ -11,14 +11,14 @@ import (
 
 type Handler struct {
 	ctx       context.Context
-	services  *service.Service
+	service   *service.Service
 	validator *validator.Validate
 }
 
 func NewHandler(ctx context.Context, service *service.Service, validator *validator.Validate) *Handler {
 	return &Handler{
 		ctx:       ctx,
-		services:  service,
+		service:   service,
 		validator: validator,
 	}
 }
@@ -26,11 +26,13 @@ func NewHandler(ctx context.Context, service *service.Service, validator *valida
 func (h *Handler) RegisterRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.Handle("POST /item", middleware.AdminMW(h.NewItem))
-	mux.Handle("DELETE /item/{id}", middleware.AdminMW(h.DeleteItem))
-	mux.Handle("GET /item/{id}", middleware.AdminMW(h.GetItem))
-	mux.Handle("PATCH /item/{id}", middleware.AdminMW(h.UpdateItem))
+	mux.Handle("POST /items", middleware.AdminMW(h.NewItem))
+	mux.Handle("DELETE /items/{id}", middleware.AdminMW(h.DeleteItem))
+	mux.Handle("GET /items/{id}", middleware.AdminMW(h.GetItem))
+	mux.Handle("PATCH /items/{id}", middleware.AdminMW(h.UpdateItem))
 
-	mux.Handle("POST /seller", middleware.AdminMW(h.NewSeller))
+	mux.Handle("POST /sellers", middleware.AdminMW(h.NewSeller))
+
+	mux.Handle("POST /orders", middleware.AdminMW(h.NewOrder))
 	return mux
 }

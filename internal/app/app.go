@@ -30,7 +30,7 @@ func StartServer() error {
 	}
 	defer db.Close()
 
-	validate := validator.New()
+	validate := validator.New(validator.WithRequiredStructEnabled())
 	store := repository.NewStore(db)
 	services := service.NewService(store)
 	handlers := controller.NewHandler(ctx, services, validate)

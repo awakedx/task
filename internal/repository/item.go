@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/awakedx/task/internal/common"
+	"github.com/awakedx/task/internal/common/item"
 	"github.com/awakedx/task/internal/domain"
 )
 
@@ -32,7 +32,7 @@ func (r *ItemRepo) Create(ctx context.Context, item *domain.Item) (int, error) {
 		item.SellerId,
 	).Scan(&id)
 	if err != nil {
-		return 0, fmt.Errorf("Failed to create item")
+		return 0, err
 	}
 	return id, nil
 }
@@ -41,7 +41,7 @@ func (r *ItemRepo) GetById(ctx context.Context, id int) (*domain.Item, error) {
 	query := `SELECT id,name,description,price,stock,seller_id FROM items WHERE id=$1`
 	err := r.db.QueryRow(ctx, query, id).Scan(&itemDB.Id, &itemDB.Name, &itemDB.Description, &itemDB.Price, &itemDB.Stock, &itemDB.SellerId)
 	if err != nil {
-		return nil, fmt.Errorf("not found by id")
+		return nil, err
 	}
 	return &itemDB, nil
 }
@@ -49,7 +49,7 @@ func (r *ItemRepo) GetById(ctx context.Context, id int) (*domain.Item, error) {
 func (r *ItemRepo) Update(ctx context.Context, updateItem *common.UpdateItem) error {
 	queryParts := []string{}
 	i := 1
-	args := make([]any, 0, 3)
+	args := make([]any, 0, 4)
 	if updateItem.Name != nil {
 		queryParts = append(queryParts, fmt.Sprintf("name=$%d", i))
 		args = append(args, updateItem.Name)
@@ -87,7 +87,7 @@ func (r *ItemRepo) GetAll(ctx context.Context) ([]domain.Item, error) {
 	query := `SELECT * FROM items`
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("failed to select items")
+		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -101,7 +101,7 @@ func (r *ItemRepo) GetAll(ctx context.Context) ([]domain.Item, error) {
 			&item.SellerId,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("failed scan from row")
+			return nil, err
 		}
 		items = append(items, item)
 	}
