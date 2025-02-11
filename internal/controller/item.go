@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	cm "github.com/awakedx/task/internal/common/item"
+	"github.com/awakedx/task/internal/common/update"
+
 	"github.com/awakedx/task/internal/service/item"
 	"github.com/awakedx/task/internal/utils"
 )
@@ -76,7 +77,7 @@ func (h *Handler) GetItem(w http.ResponseWriter, r *http.Request) {
 	i, err := h.service.Items.Get(r.Context(), itemId)
 	if err != nil && errors.Is(err, utils.NotFoundError) {
 		utils.WriteJSONResponse(w, http.StatusNotFound, map[string]any{
-			"error": utils.NotFoundError.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
@@ -100,7 +101,7 @@ func (h *Handler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	var updateItem cm.UpdateItem
+	var updateItem common.UpdateItem
 	if err = json.NewDecoder(r.Body).Decode(&updateItem); err != nil {
 		utils.WriteJSONResponse(w, http.StatusBadRequest, map[string]any{
 			"error": err.Error(),

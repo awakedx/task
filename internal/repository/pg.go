@@ -19,15 +19,14 @@ func Init() (*DB, error) {
 	if cfg.DbURI == "" {
 		return nil, fmt.Errorf("PgURL is empty")
 	}
-	fmt.Println(cfg.DbURI)
 	pgDB, err := pgxpool.New(context.Background(), cfg.DbURI)
 	if err != nil {
 		fmt.Printf("unable to create connection pool:%v\n", err)
-		return nil, fmt.Errorf("unable to create connection pool:%v", err)
+		return nil, fmt.Errorf("unable to create connection pool:%w", err)
 	}
 
 	if err = pgDB.Ping(context.Background()); err != nil {
-		return nil, fmt.Errorf("failed to connect to database")
+		return nil, err
 	}
 	err = migrations.MigrationUp()
 	slog.Info("Running migrations")

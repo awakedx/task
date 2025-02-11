@@ -2,11 +2,14 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/awakedx/task/internal/common/item"
+	"github.com/awakedx/task/internal/common/update"
 	"github.com/awakedx/task/internal/domain"
+	"github.com/awakedx/task/internal/utils"
+	"github.com/jackc/pgx/v5"
 )
 
 type ItemRepo struct {
@@ -40,8 +43,11 @@ func (r *ItemRepo) GetById(ctx context.Context, id int) (*domain.Item, error) {
 	var itemDB domain.Item
 	query := `SELECT id,name,description,price,stock,seller_id FROM items WHERE id=$1`
 	err := r.db.QueryRow(ctx, query, id).Scan(&itemDB.Id, &itemDB.Name, &itemDB.Description, &itemDB.Price, &itemDB.Stock, &itemDB.SellerId)
+	if err != nil && errors.Is(err, pgx.ErrNoRows) {
+		return nil, fmt.Errorf("%w with ID %d", utils.NotFoundError, id)
+	}
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w ,select by id %w", err, utils.InternalError)
 	}
 	return &itemDB, nil
 }

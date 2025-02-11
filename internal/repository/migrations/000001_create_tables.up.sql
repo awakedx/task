@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS items (
 
 CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
-    user_id UUID REFERENCES customers(id) ON DELETE CASCADE,
+    customer_id UUID REFERENCES customers(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    totalCost DECIMAL(10,2)
+    total_cost DECIMAL(10,2)
 );
 
 CREATE TABLE IF NOT EXISTS order_items (

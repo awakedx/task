@@ -2,12 +2,13 @@ package app
 
 import (
 	"context"
-	"log"
+	"errors"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/awakedx/task/internal/config"
 	"github.com/awakedx/task/internal/controller"
@@ -19,8 +20,6 @@ import (
 )
 
 func StartServer() error {
-	ctx := context.Background()
-
 	cfg := config.Get()
 
 	slog.Info("connection to DB")
@@ -33,7 +32,7 @@ func StartServer() error {
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	store := repository.NewStore(db)
 	services := service.NewService(store)
-	handlers := controller.NewHandler(ctx, services, validate)
+	handlers := controller.NewHandler(services, validate)
 
 	srv := http.Server{
 		Addr:         cfg.HTTPAddr,
@@ -41,20 +40,27 @@ func StartServer() error {
 		WriteTimeout: cfg.WriteTimeOut,
 		Handler:      middleware.LoggingMW(handlers.RegisterRoutes()),
 	}
+
+	errCh := make(chan error, 1)
 	go func() {
-		if err = srv.ListenAndServe(); err != nil {
-			log.Fatal(err)
+		slog.Info("Server started")
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			errCh <- err
 		}
 	}()
-	slog.Info("Server started")
 
 	sigShutDown := make(chan os.Signal, 1)
 	signal.Notify(sigShutDown, syscall.SIGTERM, syscall.SIGINT)
-	<-sigShutDown
-	slog.Info("gracefully shutting down")
-	if err := srv.Shutdown(ctx); err != nil {
-		slog.Error("error occuring by shutting down server", "error", err)
+	select {
+	case err := <-errCh:
+		return err
+	case <-sigShutDown:
+		slog.Info("gracefully shutting down")
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+		defer cancel()
+		if err := srv.Shutdown(ctx); err != nil {
+			slog.Error("error occured by shutting down server", "error", err)
+		}
+		return nil
 	}
-	db.Close()
-	return nil
 }

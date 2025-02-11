@@ -2,14 +2,10 @@ package item
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
-	"github.com/awakedx/task/internal/common/item"
+	"github.com/awakedx/task/internal/common/update"
 	"github.com/awakedx/task/internal/domain"
 	"github.com/awakedx/task/internal/repository"
-	"github.com/awakedx/task/internal/utils"
-	"github.com/jackc/pgx/v5"
 )
 
 type ItemService struct {
@@ -45,11 +41,7 @@ func (s *ItemService) NewItem(ctx context.Context, itemValues *ItemValues) ([]in
 func (s *ItemService) Get(ctx context.Context, itemId int) (*domain.Item, error) {
 	item, err := s.store.Items.GetById(ctx, itemId)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("Service.Get() %w , %w", err, utils.NotFoundError)
-		} else {
-			return nil, fmt.Errorf("Error:%w,%w", err, utils.InternalError)
-		}
+		return nil, err
 	}
 	return item, nil
 }

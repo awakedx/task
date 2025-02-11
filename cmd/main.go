@@ -1,13 +1,13 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 
 	"github.com/awakedx/task/internal/app"
 )
 
 func main() {
 	if err := app.StartServer(); err != nil {
-		log.Fatal(err)
+		slog.Error("Eror Starting server,", "err:", err.Error())
 	}
 }

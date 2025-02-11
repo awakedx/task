@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/awakedx/task/internal/controller/middleware"
@@ -10,14 +9,12 @@ import (
 )
 
 type Handler struct {
-	ctx       context.Context
 	service   *service.Service
 	validator *validator.Validate
 }
 
-func NewHandler(ctx context.Context, service *service.Service, validator *validator.Validate) *Handler {
+func NewHandler(service *service.Service, validator *validator.Validate) *Handler {
 	return &Handler{
-		ctx:       ctx,
 		service:   service,
 		validator: validator,
 	}
@@ -26,13 +23,30 @@ func NewHandler(ctx context.Context, service *service.Service, validator *valida
 func (h *Handler) RegisterRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
+	//items
 	mux.Handle("POST /items", middleware.AdminMW(h.NewItem))
 	mux.Handle("DELETE /items/{id}", middleware.AdminMW(h.DeleteItem))
 	mux.Handle("GET /items/{id}", middleware.AdminMW(h.GetItem))
 	mux.Handle("PATCH /items/{id}", middleware.AdminMW(h.UpdateItem))
 
+	//sellers
 	mux.Handle("POST /sellers", middleware.AdminMW(h.NewSeller))
+	mux.Handle("DELETE /sellers/{id}", middleware.AdminMW(h.DeleteSeller))
+	mux.Handle("PATCH /sellers/{id}", middleware.AdminMW(h.UpdateSeller))
+	mux.Handle("GET /sellers/{id}", middleware.AdminMW(h.GetSeller))
 
+	//customers
+	mux.Handle("POST /customers", middleware.AdminMW(h.NewCustomer))
+	//TODO
+	//mux.Handle("DELETE /customers/{id}", middleware.AdminMW(h.DeleteCustomer)))
+	//mux.Handle("PATCH /customers/{id}", middleware.AdminMW(h.UpdateCustomer)))
+	//mux.Handle("GET /customers/{id}", middleware.AdminMW(h.GetCustomer)))
+
+	//orders
 	mux.Handle("POST /orders", middleware.AdminMW(h.NewOrder))
+	mux.Handle("GET /orders/{id}", middleware.AdminMW(h.GetOrder))
+	//TODO
+	//mux.Handle("DELETE /orders/{id}", middleware.AdminMW(h.DeleteOrder)))
+	//mux.Handle("PATCH /orders/{id}", middleware.AdminMW(h.UpdateOrder)))
 	return mux
 }

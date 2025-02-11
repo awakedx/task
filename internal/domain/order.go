@@ -9,13 +9,13 @@ import (
 type Order struct {
 	Id         int         `json:"id"`
 	CreatedAt  time.Time   `json:"createdAt"`
-	TotalCost  float64     `json:"TotalCost"`
+	TotalCost  float64     `json:"totalCost"`
 	CustomerId uuid.UUID   `json:"customerId"`
 	Items      []OrderItem `json:"items"`
 }
 
 type OrderItem struct {
-	ItemId   int `json:"ItemId"`
-	Quantity int `json:"Quantity"`
-	Price    int `json:"price"`
+	ItemId   int     `json:"itemId"`
+	Quantity int     `json:"quantity"`
+	Price    float64 `json:"price"`
 }
