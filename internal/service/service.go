@@ -52,4 +52,7 @@ type Orders interface {
 
 type Customers interface {
 	NewCustomer(ctx context.Context, newCustomer *domain.Customer) (uuid.UUID, error)
+	GetCustomer(ctx context.Context, id uuid.UUID) (*domain.Customer, error)
+	UpdateCustomer(ctx context.Context, updateCustomer *common.UpdateCustomer) error
+	DeleteCustomer(ctx context.Context, id uuid.UUID) error
 }

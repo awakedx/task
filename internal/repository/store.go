@@ -27,8 +27,8 @@ func NewStore(db *DB) *Store {
 type Items interface {
 	Create(ctx context.Context, item *domain.Item) (int, error)
 	GetById(ctx context.Context, id int) (*domain.Item, error)
-	Delete(ctx context.Context, id int) (int, error)
 	Update(ctx context.Context, updateItem *common.UpdateItem) error
+	Delete(ctx context.Context, id int) (int, error)
 }
 
 type Sellers interface {
@@ -44,4 +44,7 @@ type Orders interface {
 }
 type Customers interface {
 	Create(ctx context.Context, newCustomer *domain.Customer) (uuid.UUID, error)
+	Get(ctx context.Context, id uuid.UUID) (*domain.Customer, error)
+	Update(ctx context.Context, updateCustomer *common.UpdateCustomer) error
+	Delete(ctx context.Context, id uuid.UUID) error
 }

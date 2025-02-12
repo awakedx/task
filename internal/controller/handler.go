@@ -25,22 +25,21 @@ func (h *Handler) RegisterRoutes() *http.ServeMux {
 
 	//items
 	mux.Handle("POST /items", middleware.AdminMW(h.NewItem))
-	mux.Handle("DELETE /items/{id}", middleware.AdminMW(h.DeleteItem))
 	mux.Handle("GET /items/{id}", middleware.AdminMW(h.GetItem))
 	mux.Handle("PATCH /items/{id}", middleware.AdminMW(h.UpdateItem))
+	mux.Handle("DELETE /items/{id}", middleware.AdminMW(h.DeleteItem))
 
 	//sellers
 	mux.Handle("POST /sellers", middleware.AdminMW(h.NewSeller))
-	mux.Handle("DELETE /sellers/{id}", middleware.AdminMW(h.DeleteSeller))
-	mux.Handle("PATCH /sellers/{id}", middleware.AdminMW(h.UpdateSeller))
 	mux.Handle("GET /sellers/{id}", middleware.AdminMW(h.GetSeller))
+	mux.Handle("PATCH /sellers/{id}", middleware.AdminMW(h.UpdateSeller))
+	mux.Handle("DELETE /sellers/{id}", middleware.AdminMW(h.DeleteSeller))
 
 	//customers
 	mux.Handle("POST /customers", middleware.AdminMW(h.NewCustomer))
-	//TODO
-	//mux.Handle("DELETE /customers/{id}", middleware.AdminMW(h.DeleteCustomer)))
-	//mux.Handle("PATCH /customers/{id}", middleware.AdminMW(h.UpdateCustomer)))
-	//mux.Handle("GET /customers/{id}", middleware.AdminMW(h.GetCustomer)))
+	mux.Handle("GET /customers/{id}", middleware.AdminMW(h.GetCustomer))
+	mux.Handle("PATCH /customers/{id}", middleware.AdminMW(h.UpdateCustomer))
+	mux.Handle("DELETE /customers/{id}", middleware.AdminMW(h.DeleteCustomer))
 
 	//orders
 	mux.Handle("POST /orders", middleware.AdminMW(h.NewOrder))
