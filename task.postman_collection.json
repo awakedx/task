@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "item",
+			"name": "+item",
 			"item": [
 				{
 					"name": "CREATE",
@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"items\": [\n        {\n            \"name\": \"Wireless Mouse\",\n            \"desc\": \"Compact ergonomic mouse.\",\n            \"price\": 19.99,\n            \"stock\": 25,\n            \"sellerId\":\"2d5b4cb1-fda4-4692-b03c-9e683c86fb2e\"\n        }\n    ]\n}",
+							"raw": "{\n    \"items\": [\n        {\n            \"name\": \"Wireless Keyboard\",\n            \"desc\": \"Compact ergonomic keyboard.\",\n            \"price\": 40,\n            \"stock\": 80,\n            \"sellerId\":\"1abbdb9b-2f64-4106-98ec-e1262b164e82\"\n        },\n        {\n            \"name\": \"Wireless mouse\",\n            \"desc\": \"Compact ergonomic mouse.\",\n            \"price\": 55,\n            \"stock\": 100,\n            \"sellerId\":\"1abbdb9b-2f64-4106-98ec-e1262b164e82\"\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -24,12 +24,12 @@
 							}
 						},
 						"url": {
-							"raw": "localhost/item",
+							"raw": "{{HOST}}/items",
 							"host": [
-								"localhost"
+								"{{HOST}}"
 							],
 							"path": [
-								"item"
+								"items"
 							]
 						}
 					},
@@ -41,13 +41,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost/item/3",
+							"raw": "{{HOST}}/items/7",
 							"host": [
-								"localhost"
+								"{{HOST}}"
 							],
 							"path": [
-								"item",
-								"3"
+								"items",
+								"7"
 							]
 						}
 					},
@@ -59,13 +59,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost/item/3",
+							"raw": "{{HOST}}/items/11",
 							"host": [
-								"localhost"
+								"{{HOST}}"
 							],
 							"path": [
-								"item",
-								"3"
+								"items",
+								"11"
 							]
 						}
 					},
@@ -78,7 +78,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"price\":56.50,\n    \"stock\":54\n}",
+							"raw": "{\n    \"price\":56.50,\n    \"stock\":77\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -86,13 +86,13 @@
 							}
 						},
 						"url": {
-							"raw": "localhost/item/3",
+							"raw": "{{HOST}}/items/11",
 							"host": [
-								"localhost"
+								"{{HOST}}"
 							],
 							"path": [
-								"item",
-								"3"
+								"items",
+								"11"
 							]
 						}
 					},
@@ -110,7 +110,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\":\"alex\",\n    \"phone\":\"123123123\"\n}",
+							"raw": "{\n    \"name\":\"alex\",\n    \"phone\":\"0131224888\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -118,12 +118,218 @@
 							}
 						},
 						"url": {
-							"raw": "localhost/seller",
+							"raw": "{{HOST}}/sellers",
 							"host": [
-								"localhost"
+								"{{HOST}}"
 							],
 							"path": [
-								"seller"
+								"sellers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/sellers/bbbf2626-9c5e-4dc5-96d6-0e8a97df2531",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"sellers",
+								"bbbf2626-9c5e-4dc5-96d6-0e8a97df2531"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"artem\",\n    \"phone\":\"0931324681\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/sellers/bbbf2626-9c5e-4dc5-96d6-0e8a97df2531",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"sellers",
+								"bbbf2626-9c5e-4dc5-96d6-0e8a97df2531"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/sellers/bbbf2626-9c5e-4dc5-96d6-0e8a97df2531",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"sellers",
+								"bbbf2626-9c5e-4dc5-96d6-0e8a97df2531"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "order",
+			"item": [
+				{
+					"name": "CREATE",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\":\"cc01f9ff-9465-4b0e-8f77-a7d395b32f33\",\n    \"items\":[\n        {\n            \"itemId\":8,\n            \"quantity\":5\n        },\n        {\n            \"itemId\":6,\n            \"quantity\":6\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/orders",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/orders/3",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"orders",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "customer",
+			"item": [
+				{
+					"name": "CREATE",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"Denys\",\n    \"phone\":\"0935456715\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/customers",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/customers/3945363c-66e0-4d12-b93f-3241c42161e0",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"customers",
+								"3945363c-66e0-4d12-b93f-3241c42161e0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\":\"0935554417\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/customers/cc01f9ff-9465-4b0e-8f77-a7d395b32f33",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"customers",
+								"cc01f9ff-9465-4b0e-8f77-a7d395b32f33"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/customers/cc01f9ff-9465-4b0e-8f77-a7d395b32f33",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"customers",
+								"cc01f9ff-9465-4b0e-8f77-a7d395b32f33"
 							]
 						}
 					},
@@ -167,6 +373,18 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "dHOST",
+			"value": "localhost/",
+			"type": "string"
+		},
+		{
+			"key": "HOST",
+			"value": "localhost:8080",
+			"type": "string"
 		}
 	]
 }
