@@ -12,6 +12,7 @@ import (
 	"github.com/awakedx/task/internal/utils"
 )
 
+// ++
 func (h *Handler) NewItem(w http.ResponseWriter, r *http.Request) {
 	var itemValue item.ItemValues
 	if err := json.NewDecoder(r.Body).Decode(&itemValue); err != nil {
@@ -20,19 +21,24 @@ func (h *Handler) NewItem(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+
 	if err := h.validator.Struct(&itemValue); err != nil {
 		utils.WriteJSONResponse(w, http.StatusBadRequest, map[string]any{
 			"error": err.Error(),
 		})
 		return
 	}
+
 	ids, err := h.service.Items.NewItem(r.Context(), &itemValue)
 	if err != nil {
-		utils.WriteJSONResponse(w, http.StatusInternalServerError, err)
+		utils.WriteJSONResponse(w, http.StatusInternalServerError, map[string]any{
+			"error": err.Error(),
+		})
 		return
 	}
+
 	utils.WriteJSONResponse(w, http.StatusCreated, map[string]any{
-		"Message": "successfully created",
+		"message": "successfully created",
 		"ids":     ids,
 	})
 	return
@@ -46,16 +52,15 @@ func (h *Handler) DeleteItem(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	id, err := h.service.Items.Delete(r.Context(), itemId)
-	if err != nil && err.Error() != "Nothing to delete" {
-		utils.WriteJSONResponse(w, http.StatusInternalServerError, map[string]any{
-			"delete id": id,
-			"error":     err.Error(),
+	if err != nil && errors.Is(err, utils.BadRequestErr) {
+		utils.WriteJSONResponse(w, http.StatusBadRequest, map[string]any{
+			"error": err.Error(),
 		})
 		return
 	}
-	if err != nil && err.Error() == "Nothing to delete" {
-		utils.WriteJSONResponse(w, http.StatusBadRequest, map[string]any{
-			"error": "No item for deletion",
+	if err != nil {
+		utils.WriteJSONResponse(w, http.StatusInternalServerError, map[string]any{
+			"error": err.Error(),
 		})
 		return
 	}
@@ -69,7 +74,7 @@ func (h *Handler) GetItem(w http.ResponseWriter, r *http.Request) {
 	itemId, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		utils.WriteJSONResponse(w, http.StatusBadRequest, map[string]any{
-			"error": err.Error(),
+			"error": "invalid id",
 		})
 		return
 	}
@@ -97,7 +102,7 @@ func (h *Handler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		utils.WriteJSONResponse(w, http.StatusBadRequest, map[string]any{
-			"error": err.Error(),
+			"error": "invalid id",
 		})
 		return
 	}
@@ -116,14 +121,14 @@ func (h *Handler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 	}
 	updateItem.Id = &id
 	err = h.service.Items.UpdateItem(r.Context(), &updateItem)
-	if err != nil && err.Error() != "not found by id" {
-		utils.WriteJSONResponse(w, http.StatusInternalServerError, map[string]any{
+	if err != nil && errors.Is(err, utils.NotFoundError) {
+		utils.WriteJSONResponse(w, http.StatusBadRequest, map[string]any{
 			"error": err.Error(),
 		})
 		return
 	}
-	if err != nil && err.Error() == "not found by id" {
-		utils.WriteJSONResponse(w, http.StatusBadRequest, map[string]any{
+	if err != nil && errors.Is(err, utils.InternalError) {
+		utils.WriteJSONResponse(w, http.StatusInternalServerError, map[string]any{
 			"error": err.Error(),
 		})
 		return

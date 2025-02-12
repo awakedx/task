@@ -96,7 +96,8 @@ func (h *Handler) UpdateSeller(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	updateSeller.Id, err = uuid.Parse(r.PathValue("id"))
+	id, err := uuid.Parse(r.PathValue("id"))
+	updateSeller.Id = &id
 	if err != nil {
 		utils.WriteJSONResponse(w, http.StatusBadRequest, map[string]any{
 			"err": err.Error(),

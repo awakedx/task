@@ -39,11 +39,7 @@ func (s *ItemService) NewItem(ctx context.Context, itemValues *ItemValues) ([]in
 }
 
 func (s *ItemService) Get(ctx context.Context, itemId int) (*domain.Item, error) {
-	item, err := s.store.Items.GetById(ctx, itemId)
-	if err != nil {
-		return nil, err
-	}
-	return item, nil
+	return s.store.Items.GetById(ctx, itemId)
 }
 
 func (s *ItemService) Delete(ctx context.Context, itemId int) (int, error) {

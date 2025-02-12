@@ -84,7 +84,7 @@ func (h *Handler) UpdateCustomer(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	updateCustomer.Id = id
+	updateCustomer.Id = &id
 	fmt.Println(updateCustomer)
 	err = h.service.Customers.UpdateCustomer(r.Context(), &updateCustomer)
 	if err != nil {

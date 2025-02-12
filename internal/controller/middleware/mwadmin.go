@@ -19,6 +19,7 @@ func AdminMW(next http.HandlerFunc) http.HandlerFunc {
 		if ok {
 			if adminUsername == username && adminPassword == pass {
 				next(w, r)
+				return
 			}
 		} else {
 			utils.WriteJSONResponse(w, http.StatusUnauthorized, "Unauthorized")

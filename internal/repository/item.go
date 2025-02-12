@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/awakedx/task/internal/common/update"
@@ -44,10 +45,16 @@ func (r *ItemRepo) GetById(ctx context.Context, id int) (*domain.Item, error) {
 	query := `SELECT id,name,description,price,stock,seller_id FROM items WHERE id=$1`
 	err := r.db.QueryRow(ctx, query, id).Scan(&itemDB.Id, &itemDB.Name, &itemDB.Description, &itemDB.Price, &itemDB.Stock, &itemDB.SellerId)
 	if err != nil && errors.Is(err, pgx.ErrNoRows) {
-		return nil, fmt.Errorf("%w with ID %d", utils.NotFoundError, id)
+		return nil, &utils.CustomErr{
+			Msg:   fmt.Sprintf("Item not found by id:%d", id),
+			Cause: utils.NotFoundError,
+		}
 	}
 	if err != nil {
-		return nil, fmt.Errorf("%w ,select by id %w", err, utils.InternalError)
+		return nil, &utils.CustomErr{
+			Msg:   err.Error(),
+			Cause: utils.InternalError,
+		}
 	}
 	return &itemDB, nil
 }
@@ -81,9 +88,13 @@ func (r *ItemRepo) Update(ctx context.Context, updateItem *common.UpdateItem) er
 	}
 	query := fmt.Sprintf("UPDATE items SET %s WHERE id=$%d", strings.Join(queryParts, ", "), i)
 	args = append(args, updateItem.Id)
-	_, err := r.db.Exec(ctx, query, args...)
+	res, err := r.db.Exec(ctx, query, args...)
+	slog.Info("updated", "SQL response:", res.Update())
 	if err != nil {
-		return fmt.Errorf("failed to update item,err:%v", err)
+		return &utils.CustomErr{
+			Msg:   err.Error(),
+			Cause: utils.InternalError,
+		}
 	}
 	return nil
 }
@@ -118,8 +129,11 @@ func (r *ItemRepo) Delete(ctx context.Context, id int) (int, error) {
 	var deletedId int
 	query := `DELETE FROM items WHERE id=$1 RETURNING id`
 	err := r.db.QueryRow(ctx, query, id).Scan(&deletedId)
-	if err != nil && err.Error() == "no rows in result set" {
-		return 0, fmt.Errorf("Nothing to delete")
+	if err != nil && errors.Is(err, pgx.ErrNoRows) {
+		return 0, &utils.CustomErr{
+			Msg:   fmt.Sprintf("not found item with id:%d for deletion", id),
+			Cause: utils.BadRequestErr,
+		}
 	}
 	return deletedId, nil
 }
